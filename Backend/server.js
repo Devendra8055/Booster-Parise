@@ -9,8 +9,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+// MONGODB ATLAS CONNECTION
 mongoose
-  .connect("mongodb://127.0.0.1:27017/boosterparise")
+.connect(
+  "mongodb+srv://ownsdevil_db_user:PASSWORD@cluster0....mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+   )
   .then(() => {
     console.log("MongoDB Connected");
   })
@@ -18,6 +22,8 @@ mongoose
     console.log(err);
   });
 
+
+// TEST ROUTE
 app.get("/", (req, res) => {
   res.send("Backend Running");
 });
@@ -45,10 +51,20 @@ app.post("/add-product", async (req, res) => {
 
 // GET PRODUCTS API
 app.get("/products", async (req, res) => {
-  const products = await Product.find();
+  try {
+    const products = await Product.find();
 
-  res.json(products);
+    res.json(products);
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
 });
+
+
+// DELETE PRODUCT API
 app.delete("/delete-product/:id", async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
@@ -64,6 +80,9 @@ app.delete("/delete-product/:id", async (req, res) => {
     });
   }
 });
+
+
+// UPDATE PRODUCT API
 app.put("/update-product/:id", async (req, res) => {
   try {
     await Product.findByIdAndUpdate(
@@ -82,6 +101,9 @@ app.put("/update-product/:id", async (req, res) => {
     });
   }
 });
+
+
+// SERVER
 app.listen(5000, () => {
   console.log("Server running on port 5000");
 });
