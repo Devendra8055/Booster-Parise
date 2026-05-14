@@ -12,9 +12,7 @@ app.use(express.json());
 
 // MONGODB ATLAS CONNECTION
 mongoose
-.connect(
-  "mongodb+srv://ownsdevil_db_user:PASSWORD@cluster0....mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-   )
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
   })
