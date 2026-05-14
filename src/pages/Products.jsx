@@ -16,16 +16,33 @@ export default function Products() {
     fetchProducts();
   }, []);
 
+  // FETCH PRODUCTS
   const fetchProducts = async () => {
-    const response = await fetch(
-      "http://localhost:5000/products"
-    );
+    try {
+      const response = await fetch(
+        "https://booster-parise-backend.onrender.com/products"
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    setProducts(data);
+      setProducts(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
+  // ADD TO CART
+  const addToCart = (product) => {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    cart.push(product);
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    alert("Product Added To Cart");
+  };
+
+  // START EDITING
   const startEditing = (product) => {
     setEditingId(product._id);
 
@@ -37,52 +54,65 @@ export default function Products() {
     });
   };
 
+  // UPDATE PRODUCT
   const updateProduct = async () => {
-    const response = await fetch(
-      `http://localhost:5000/update-product/${editingId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editData),
-      }
-    );
+    try {
+      const response = await fetch(
+        `https://booster-parise-backend.onrender.com/update-product/${editingId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editData),
+        }
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    alert(data.message);
+      alert(data.message);
 
-    setEditingId(null);
+      setEditingId(null);
 
-    fetchProducts();
+      fetchProducts();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
+  // DELETE PRODUCT
   const deleteProduct = async (id) => {
-    const response = await fetch(
-      `http://localhost:5000/delete-product/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    try {
+      const response = await fetch(
+        `https://booster-parise-backend.onrender.com/delete-product/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    alert(data.message);
+      alert(data.message);
 
-    fetchProducts();
+      fetchProducts();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <div
       style={{
         padding: "40px",
+        background: "#f5f5f5",
+        minHeight: "100vh",
       }}
     >
       <h1
         style={{
           textAlign: "center",
           marginBottom: "40px",
+          fontSize: "45px",
         }}
       >
         Our Products
@@ -96,6 +126,7 @@ export default function Products() {
             padding: "20px",
             border: "1px solid gray",
             borderRadius: "10px",
+            background: "white",
           }}
         >
           <h2>Edit Product</h2>
@@ -151,8 +182,6 @@ export default function Products() {
             style={inputStyle}
           />
 
-          <br />
-
           <button
             onClick={updateProduct}
             style={{
@@ -174,8 +203,8 @@ export default function Products() {
         style={{
           display: "grid",
           gridTemplateColumns:
-            "repeat(auto-fit,minmax(250px,1fr))",
-          gap: "20px",
+            "repeat(auto-fit,minmax(280px,1fr))",
+          gap: "25px",
         }}
       >
         {products.map((product) => (
@@ -186,7 +215,6 @@ export default function Products() {
               overflow: "hidden",
               background: "white",
               boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
-              transition: "0.3s",
             }}
           >
             <img
@@ -198,64 +226,36 @@ export default function Products() {
                 objectFit: "cover",
               }}
             />
-5
-            <div style={{ padding: "15px" }}>
-              <h2
-                 
-                 style={{
-                 fontSize: "24px",
-                 marginBottom: "10px",
-                }}
-                  >
-                {product.name}
-              </h2>
 
-              <h3
-                style={{
-                  color: "green",
-                }}
-              >
+            <div style={{ padding: "15px" }}>
+              <h2>{product.name}</h2>
+
+              <h3 style={{ color: "green" }}>
                 ₹ {product.price}
               </h3>
 
-              <p
-                style={{
-                color: "#555",
-                lineHeight: "1.6",
-             }}
-             >
-               {product.description}
-              </p>
+              <p>{product.description}</p>
 
-              {/* EDIT BUTTON */}
+              {/* ADD TO CART */}
+              <button
+                onClick={() => addToCart(product)}
+                style={greenButton}
+              >
+                Add To Cart
+              </button>
+
+              {/* EDIT */}
               <button
                 onClick={() => startEditing(product)}
-                style={{
-                  marginTop: "10px",
-                  marginRight: "10px",
-                  padding: "10px 20px",
-                  background: "orange",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
+                style={orangeButton}
               >
                 Edit
               </button>
 
-              {/* DELETE BUTTON */}
+              {/* DELETE */}
               <button
                 onClick={() => deleteProduct(product._id)}
-                style={{
-                  marginTop: "10px",
-                  padding: "10px 20px",
-                  background: "red",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
+                style={redButton}
               >
                 Delete
               </button>
@@ -273,4 +273,36 @@ const inputStyle = {
   marginBottom: "15px",
   borderRadius: "5px",
   border: "1px solid gray",
+};
+
+const greenButton = {
+  marginTop: "10px",
+  marginRight: "10px",
+  padding: "10px 20px",
+  background: "green",
+  color: "white",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer",
+};
+
+const orangeButton = {
+  marginTop: "10px",
+  marginRight: "10px",
+  padding: "10px 20px",
+  background: "orange",
+  color: "white",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer",
+};
+
+const redButton = {
+  marginTop: "10px",
+  padding: "10px 20px",
+  background: "red",
+  color: "white",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer",
 };
